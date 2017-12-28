@@ -113,6 +113,8 @@ tb_3_f <- forecast(tb_3, freq*day_thirds)
 tbats_for <- c(tb_1_f$mean, tb_2_f$mean, tb_3_f$mean)
 
 # Main cycle - training and forecasting ----
+source("forecasting_methods.R")
+source("ensembleWeighting.R")
 
 # First iteration - sliding window approach
 # lengths of training sets
