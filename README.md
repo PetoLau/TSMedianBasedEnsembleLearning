@@ -8,3 +8,5 @@ Citation:
 G. Kosková, P. Laurinec, V. Rozinajová, A. B. Ezzeddine, M. Lucká, P. Lacko, P. Vrablecová, and P. Návrat,
 "Incremental ensemble learning for electricity load forecasting",
 Acta Polytechnica Hungarica, vol. 13, no. 2, pp. 97–117, 2015, issn: 17858860.
+
+You can read more about my research here: [petolau.github.io/research/](https://petolau.github.io/research/)
