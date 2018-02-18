@@ -1,9 +1,9 @@
 ensemble_ts <- function(elek, elekwave, eleknoise, for_long_1, for_long_2, for_long_3, freq = 24) {
 
   ar_w <- ar(elekwave, FALSE, 2*freq)
-  ar_w_f <- forecast(ar_w, freq)
+  ar_w_f <- predict(ar_w, n.ahead = freq)
   ar_n <- ar(eleknoise, FALSE, 2*freq)
-  ar_n_f <- forecast(ar_n, freq)
+  ar_n_f <- predict(ar_n, n.ahead = freq)
   
   HW_w <- HoltWinters(elekwave, beta = F, alpha = 0.15, gamma = 0.95, seasonal = "additive")
   HW_w_f <- forecast(HW_w, freq)
@@ -20,7 +20,7 @@ ensemble_ts <- function(elek, elekwave, eleknoise, for_long_1, for_long_2, for_l
   naive_f <-snaive(elek, freq)
 
   forecasts <- matrix(rep(0, 9*freq), nrow = freq, byrow = T)
-  forecasts[,1] <- ar_w_f$mean + ar_n_f$mean
+  forecasts[,1] <- as.numeric(ar_w_f$pred + ar_n_f$pred)
   forecasts[,2] <- HW_w_f$mean + HW_n_f$mean
   forecasts[,3] <- stl_exp_f$mean
   forecasts[,4] <- stl_arima_f$mean

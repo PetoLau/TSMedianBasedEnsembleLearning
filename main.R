@@ -19,6 +19,7 @@ data <- data[year %in% c(2014, 2015)]
 setkey(data, "dateTime")
 # remove weekends and subset only working days without Monday - as in the our paper in ACTA Journal
 data <- data[dayOfWeek %in% 2:5]
+data[, load := as.numeric(load)]
 
 # Long term forecasts ----
 # subset train curve for moving median and average computation
@@ -135,7 +136,7 @@ test_ts <- ts(test_data[((n2*freq)+1):(k2*freq)], start = n2, freq = freq)
 wavet <- wavShrink(train_ts, wavelet = "s8", shrink.fun = "soft", thresh.fun = "universal",
                    threshold = NULL, thresh.scale = 1, xform = "dwt", noise.variance = 0.0, reflect = TRUE)
 
-train_wave <- ts(wavet, start = 0, freq = freq)
+train_wave <- ts(as.numeric(wavet), start = 0, freq = freq)
 remain <- train_ts - train_wave
 
 # 2. regression part
@@ -157,9 +158,19 @@ for_med <- curve_median_final[1:freq]
 # ens_method <- data.frame(rep(0, 1))
 
 # forecasting
-ts_for <- ensemble_ts(elek = train_ts, elekwave = train_wave, eleknoise = remain,
-                      for_tbats, for_ave, for_med, freq = freq)
-reg_for <- ensemble_reg(train_reg, wavet_reg, remain_reg, n, k, freq = freq)
+ts_for <-
+  ensemble_ts(
+    elek = train_ts,
+    elekwave = train_wave,
+    eleknoise = remain,
+    for_long_1 = for_tbats,
+    for_long_2 = for_ave,
+    for_long_3 = for_med,
+    freq = freq
+  )
+
+reg_for <-
+  ensemble_reg(train_reg, wavet_reg, remain_reg, n, k, freq = freq)
 
 methods_for <- cbind(ts_for$methods, reg_for$methods)
 
@@ -188,13 +199,13 @@ for(i in 1:(n_days-3)) {
   wavet_ts <- wavShrink(train_ts, wavelet="s8", shrink.fun="soft", thresh.fun="universal", threshold=NULL, thresh.scale=1, xform="dwt", noise.variance=0.0, reflect=TRUE)
   wavet_reg <- wavShrink(ts(train_reg, freq = freq), wavelet="s8", shrink.fun="soft", thresh.fun="universal", threshold=NULL, thresh.scale=1, xform="dwt", noise.variance=0.0, reflect=TRUE)
   
-  train_wave <- ts(wavet_ts, start = i, freq = freq)
+  train_wave <- ts(as.numeric(wavet_ts), start = i, freq = freq)
   remain <- train_ts - train_wave
   remain_reg <- train_reg - wavet_reg
   
   ts_for <- ensemble_ts(elek = train_ts, elekwave = train_wave, eleknoise = remain,
                         for_tbats, for_ave, for_med, freq = freq)
-  reg_for <- ensemble_reg(train_reg, wavet_reg, remain_reg, n, k, freq = freq)
+  reg_for <- ensemble_reg(train_reg, as.numeric(wavet_reg), remain_reg, n, k, freq = freq)
   
   methods_for <- cbind(ts_for$methods, reg_for$methods)
   
